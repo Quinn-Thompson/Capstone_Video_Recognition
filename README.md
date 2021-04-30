@@ -10,6 +10,12 @@ graphical interface.
 
 ### Linux
 
+Visit the
+[librealsense](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md)
+If using Ubuntu, follow the instructions for adding the repos and install
+packages. Otherwise, following the instructions for building and installing the
+libraries from source.
+
 ### Mac
 
 ### Windows
