@@ -2,10 +2,12 @@ import tensorflow as tf
 import DBM
 from tensorflow import keras
 import numpy as np
+import IE
+
 
 class CapModel:
     def __init__(self):
-        self.model = tf.keras.models.load_model('my_model/dog')
+        self.model = './my_model/dog/dog.xml'
         self.sequence_len = 14
         self.image_sequence = np.zeros((1, self.sequence_len, 48, 64, 1))
 
@@ -15,9 +17,10 @@ class CapModel:
         image_w_channel = np.reshape(image, (np.shape(image)[0], np.shape(image)[1], 1))
         self.image_sequence = np.roll(self.image_sequence, shift=-1, axis=1)
         self.image_sequence[0][self.sequence_len-1] = image_w_channel
+        ie = IE
 
-
-        predictions = self.model.predict(self.image_sequence)
+        predictions = ie.predict(self, model=self.model, input=self.image_sequence, device="CPU")
+        #predictions = self.model.predict(self.image_sequence)
 
         indx = np.argmax(predictions)
         return chr(ord('@')+indx), predictions[0][indx]*100
