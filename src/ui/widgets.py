@@ -1,15 +1,11 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
+from PyQt5 import QtGui, QtWidgets
 
-from cv2 import cv2
-import numpy as np
 from src.ui.layouts import ClassificationLayout
 
 
 class EndUserWidget(QtWidgets.QWidget):
-    def __init__(self, vt):
+    def __init__(self):
         super(EndUserWidget, self).__init__()
-
-        vt.signalUpdateImage.connect(self.updateImage)
 
         self.setObjectName("widgetEndUser")
 
@@ -27,28 +23,10 @@ class EndUserWidget(QtWidgets.QWidget):
         self.lc = ClassificationLayout()
         self.layout.addLayout(self.lc)
 
-    @QtCore.pyqtSlot(np.ndarray)
-    def updateImage(self, cvImg):
-        rgbImg = cv2.cvtColor(cvImg, cv2.COLOR_BGR2RGB)
-        h, w, ch = rgbImg.shape
-        self.labelImage.setPixmap(
-            QtGui.QPixmap.fromImage(
-                QtGui.QImage(
-                    rgbImg.data, w, h, ch * w, QtGui.QImage.Format_RGB888
-                ).scaled(
-                    self.displayWidth,
-                    self.displayHeight,
-                    QtCore.Qt.KeepAspectRatio,
-                )
-            )
-        )
-
 
 class DevWidget(QtWidgets.QWidget):
-    def __init__(self, vt):
+    def __init__(self):
         super(DevWidget, self).__init__()
-
-        vt.signalUpdateImage.connect(self.updateImage)
 
         self.setObjectName("widgetDev")
 
@@ -77,43 +55,10 @@ class DevWidget(QtWidgets.QWidget):
 
         self.layout.addLayout(self.lc)
 
-    @QtCore.pyqtSlot(np.ndarray)
-    def updateImage(self, cvImg):
-        rgbImg = cv2.cvtColor(cvImg, cv2.COLOR_BGR2RGB)
-        preprocImg = self.preProcImg(cvImg)
-        h, w, ch = rgbImg.shape
-        self.labelImage.setPixmap(
-            QtGui.QPixmap.fromImage(
-                QtGui.QImage(
-                    rgbImg.data, w, h, ch * w, QtGui.QImage.Format_RGB888
-                ).scaled(
-                    self.displayWidth,
-                    self.displayHeight,
-                    QtCore.Qt.KeepAspectRatio,
-                )
-            )
-        )
-        self.labelPreProcImage.setPixmap(
-            QtGui.QPixmap.fromImage(
-                QtGui.QImage(
-                    preprocImg.data, w, h, ch * w, QtGui.QImage.Format_RGB888
-                ).scaled(
-                    self.displayWidth,
-                    self.displayHeight,
-                    QtCore.Qt.KeepAspectRatio,
-                )
-            )
-        )
-
-    def preProcImg(self, img):
-        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
 
 class TrainingWidget(QtWidgets.QWidget):
-    def __init__(self, vt):
+    def __init__(self):
         super(TrainingWidget, self).__init__()
-
-        vt.signalUpdateImage.connect(self.updateImage)
 
         self.setObjectName("widgetTraining")
 
@@ -137,22 +82,3 @@ class TrainingWidget(QtWidgets.QWidget):
         self.layoutVid.addWidget(self.labelPreProcImage)
         self.layoutVid.addWidget(self.labelCapturedImage)
         self.layout.addLayout(self.layoutVid)
-
-    @QtCore.pyqtSlot(np.ndarray)
-    def updateImage(self, cvImg):
-        preprocImg = self.preProcImg(cvImg)
-        h, w, ch = preprocImg.shape
-        self.labelPreProcImage.setPixmap(
-            QtGui.QPixmap.fromImage(
-                QtGui.QImage(
-                    preprocImg.data, w, h, ch * w, QtGui.QImage.Format_RGB888
-                ).scaled(
-                    self.displayWidth,
-                    self.displayHeight,
-                    QtCore.Qt.KeepAspectRatio,
-                )
-            )
-        )
-
-    def preProcImg(self, img):
-        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

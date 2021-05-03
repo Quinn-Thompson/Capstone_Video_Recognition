@@ -37,3 +37,8 @@ class ClassificationLayout(QtWidgets.QGridLayout):
         self.addWidget(self.labelPredict21, 2, 1)
         self.addWidget(self.labelPredict30, 3, 0)
         self.addWidget(self.labelPredict31, 3, 1)
+
+    def updatePredictions(self, predictions):
+        self.labelPredict11.setText(predictions[0])
+        self.labelPredict21.setText(predictions[1])
+        self.labelPredict31.setText(predictions[2])

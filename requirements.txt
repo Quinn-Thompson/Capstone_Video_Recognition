@@ -1,7 +1,6 @@
 numpy==1.16.3
-matplotlib==3.0.3
 opencv-python
 pyrealsense2==2.29.0.1124
-Pillow==7.1.2
 PyQt5==5.14.2
-scikit_learn==0.23.0
+tensorflow
+pickle5
