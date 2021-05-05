@@ -103,27 +103,13 @@ class MLGestureRecognition(QtWidgets.QWidget):
 
     def loadModel(self, model):
         print(f">>> Load model: {model}")
-        self.model = ModelWrapper.CapModel()
+        if model == "dog":
+            self.model = ModelWrapper.CapModel()
 
     @QtCore.pyqtSlot(np.ndarray)
     def updateImage(self, cvImg):
         cur = self.stackedWidget.currentWidget()
         if cur == self.widgetEndUser or cur == self.widgetDev:
-            rgbImg = cv2.cvtColor(cvImg, cv2.COLOR_BGR2RGB)
-            h, w, ch = rgbImg.shape
-            cur.labelImage.setPixmap(
-                QtGui.QPixmap.fromImage(
-                    QtGui.QImage(
-                        rgbImg.data, w, h, ch * w, QtGui.QImage.Format_RGB888
-                    ).scaled(
-                        cur.displayWidth,
-                        cur.displayHeight,
-                        QtCore.Qt.KeepAspectRatio,
-                    )
-                )
-            )
-            cur.lc.updatePredictions(self.model.getTop3(cvImg))
-        if cur == self.widgetDev or cur == self.widgetTraining:
             preProcImg = self.preProc(cvImg)
             h, w, ch = preProcImg.shape
             cur.labelPreProcImage.setPixmap(
@@ -134,6 +120,21 @@ class MLGestureRecognition(QtWidgets.QWidget):
                         h,
                         ch * w,
                         QtGui.QImage.Format_RGB888,
+                    ).scaled(
+                        cur.displayWidth,
+                        cur.displayHeight,
+                        QtCore.Qt.KeepAspectRatio,
+                    )
+                )
+            )
+            cur.lc.updatePredictions(self.model.getTop3(cvImg))
+        if cur == self.widgetDev or cur == self.widgetTraining:
+            rgbImg = cv2.cvtColor(cvImg, cv2.COLOR_BGR2RGB)
+            h, w, ch = rgbImg.shape
+            cur.labelImage.setPixmap(
+                QtGui.QPixmap.fromImage(
+                    QtGui.QImage(
+                        rgbImg.data, w, h, ch * w, QtGui.QImage.Format_RGB888
                     ).scaled(
                         cur.displayWidth,
                         cur.displayHeight,
