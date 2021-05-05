@@ -20,8 +20,10 @@ class RSC:
 
             # Configure the camera, and connect
             cls.config = rs.config()
+            # framerate can be set here but only at certain intervals (last item)
             cls.config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16,
-                                     30)
+                                     60)
+
 
             # Create an align object
             # rs.align allows us to perform alignment of depth
@@ -52,7 +54,9 @@ class RSC:
         # create the mono-color image as a np array
         img = np.asanyarray(aligned_depth_frame.get_data())
 
-        return img
+        depth_image = img.copy()
+
+        return depth_image
 
     def display(self):
         # update the plot/image

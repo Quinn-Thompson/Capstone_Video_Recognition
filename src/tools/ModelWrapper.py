@@ -1,28 +1,46 @@
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-from .preproc import resize
+from .preproc import PreProc
+import cv2
+
+class Predict:
+    def __init__(self):
+        self.conf = 0
+    
+    def predict_best3(self, model_in, input_to_model):
+        predictions = model_in.predict(input_to_model)
+        
+        out = []
+        # can't wrap from negative to positive slice, ae -3:0
+        # and because the latter end is non-inclusive (0 should return -1), this just doesn't work
+        index_sort = predictions.argsort() 
+        best_three = [index_sort[0][-1], index_sort[0][-2], index_sort[0][-3]]
+
+
+        for indx in best_three:
+            conf = predictions[0][indx]*100
+            out.append(str("Prediction Character: " + chr(ord('@')+indx)) + "  Confidence Value: " + str(self.conf))
+
+        return out
+
 
 class CapModel:
     def __init__(self):
         self.model = tf.keras.models.load_model('models/dog')
         self.sequence_len = 14
         self.image_sequence = np.zeros((1, self.sequence_len, 48, 64, 1))
-
+        self.pp = PreProc()
+        self.pred = Predict()
 
     def Classify(self, image):
 
-        image = self.pp.resize(new_shape=(48, 64), image=image)
         # reshape the image so that it has a channel
         image_w_channel = np.reshape(image, (np.shape(image)[0], np.shape(image)[1], 1))
         self.image_sequence = np.roll(self.image_sequence, shift=-1, axis=1)
         self.image_sequence[0][self.sequence_len-1] = image_w_channel
-
-        predictions = self.model.predict(self.image_sequence)
-
-        predictions.sort()
-
-        return map(str, predictions[0][0:3]*100)
+        
+        return self.pred.predict_best3(self.model, self.image_sequence)
 
 # this is a debug method, used for tseting the model wrapper without any other files
 if ( __name__ == "__main__" ):
