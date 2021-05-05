@@ -31,5 +31,4 @@ class VideoThread(QtCore.QThread):
                 self.signalUpdateImage.emit(im_depth)
                 # reset the image life
                 self.imLife = time.time() * 1000
-                #print("timestamp videoThread: " + str(time.time() * 1000) + ". t between last frame " + str (time.time() * 1000 - self.prev_time))
-                self.prev_time = time.time() * 1000
+

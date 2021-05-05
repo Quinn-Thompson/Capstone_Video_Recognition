@@ -24,12 +24,12 @@ class MLGestureRecognition(QtWidgets.QWidget):
 
     def setupUI(self):
         self.initMainWindow()
-
+        self.initVideoThread()
         self.initMenuBar()
         self.initUI()
         self.mainWindow.setCentralWidget(self.stackedWidget)
         QtCore.QMetaObject.connectSlotsByName(self.mainWindow)
-        self.initVideoThread()
+        
 
     def initMainWindow(self):
         self.mainWindow = QtWidgets.QMainWindow()
@@ -111,11 +111,10 @@ class MLGestureRecognition(QtWidgets.QWidget):
         print(f">>> Load model: {model}")
         if model == "dog":
             self.model = CapModel()
+            self.thread.imExp = 100
 
     @QtCore.pyqtSlot(np.ndarray)
     def updateImage(self, cvImg):
-        print("timestamp updateImage: " + str(time.time() * 1000) + ". t between last frame " + str (time.time() * 1000 - self.prev_time) + "\n")
-        self.prev_time = time.time() * 1000
         cur = self.stackedWidget.currentWidget()
 
         preProcImgD, preProcImgN = self.preProc(cvImg)
@@ -135,7 +134,8 @@ class MLGestureRecognition(QtWidgets.QWidget):
         if cur == self.widgetTraining:
             if cur.btnRec.isChecked():
                 if cur.streamIdx < cur.streamLength:
-                    cur.recording[cur.streamIdx] = preProcImgD
+                    cur.recording[cur.streamIdx] = preProcImgN
+                    cur.recordingD[cur.streamIdx] = preProcImgD
                 else:
                     cur.btnRec.setChecked(False)
 
@@ -145,7 +145,7 @@ class MLGestureRecognition(QtWidgets.QWidget):
             cur.labelCapturedImage.setPixmap(
                 QtGui.QPixmap.fromImage(
                     QtGui.QImage(
-                        cur.recording[cur.streamIdx].data,
+                        cur.recordingD[cur.streamIdx].data,
                         w,
                         h,
                         w,
@@ -163,11 +163,10 @@ class MLGestureRecognition(QtWidgets.QWidget):
         h, w = cvImg.shape
 
         if cur != self.widgetTraining:
-            cur.lc.updatePredictions(self.model.Classify(cvImg))
+            cur.lc.updatePredictions(self.model.Classify(preProcImgN))
 
         if cur == self.widgetDev:
-            rgbImg = cv2.cvtColor(cvImg, cv2.COLOR_BGR2RGB)
-            h, w = rgbImg.shape
+            h, w = cvImg.shape
             cur.labelImage.setPixmap(
                 QtGui.QPixmap.fromImage(
                     QtGui.QImage(
@@ -179,7 +178,6 @@ class MLGestureRecognition(QtWidgets.QWidget):
                     )
                 )
             )
-        print("Finished signal\n")
 
     # TODO: Update preProc
     def preProc(self, img):

@@ -65,7 +65,8 @@ class TrainingWidget(QtWidgets.QWidget):
         super(TrainingWidget, self).__init__()
         self.streamLength = 24
         self.streamIdx = 0
-        self.recording = np.ndarray((self.streamLength, 480, 640, 3), dtype=np.uint8)
+        self.recording = np.ndarray((self.streamLength, 48, 64), dtype=np.float)
+        self.recordingD = np.ndarray((self.streamLength, 480, 640), dtype=np.uint8)
 
         self.setObjectName("widgetTraining")
 
@@ -97,6 +98,7 @@ class TrainingWidget(QtWidgets.QWidget):
         self.btnRec.setText("Record")
         self.btnRec.setShortcut("Space")
         self.btnRec.setCheckable(True)
+        self.btnRec.clicked.connect(self.recBtn)
 
         self.btnSave = QtWidgets.QPushButton(self)
         self.btnSave.setText("Save")
@@ -111,8 +113,9 @@ class TrainingWidget(QtWidgets.QWidget):
     def recBtn(self):
         if self.btnRec.isChecked():
             print(">>> Start Recording")
+            self.recording = np.zeros((self.streamLength, 48, 64), dtype=np.float)
+            self.recordingD = np.zeros((self.streamLength, 480, 640), dtype=np.uint8)
             self.streamIdx = 0
-            self.recording = np.zeros((self.streamLength, 480, 640, 3), dtype=np.uint8)
         else:
             print(">>> Button Not Clicked")
 
@@ -125,4 +128,5 @@ class TrainingWidget(QtWidgets.QWidget):
             print(fileName)
             with open(fileName, "bx") as fd:
                 pickle.dump(np.array(self.recording), fd)
-        self.recording = np.zeros((self.streamLength, 480, 640, 3), dtype=np.uint8)
+        self.recording = np.zeros((self.streamLength, 48, 64), dtype=np.float)
+        self.recordingD = np.zeros((self.streamLength, 480, 640), dtype=np.uint8)
