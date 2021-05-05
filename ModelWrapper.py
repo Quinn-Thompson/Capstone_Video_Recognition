@@ -5,7 +5,7 @@ import numpy as np
 
 class CapModel:
     def __init__(self):
-        self.model = tf.keras.models.load_model('my_model/dog')
+        self.model = tf.keras.models.load_model('models/dog')
         self.sequence_len = 14
         self.image_sequence = np.zeros((1, self.sequence_len, 48, 64, 1))
 
@@ -21,6 +21,10 @@ class CapModel:
 
         indx = np.argmax(predictions)
         return chr(ord('@')+indx), predictions[0][indx]*100
+
+    # TODO: return top 3 predictions
+    def getTop3(self, image):
+        return ["D", "O", "G"]
 
 # this is a debug method, used for tseting the model wrapper without any other files
 if ( __name__ == "__main__" ):
