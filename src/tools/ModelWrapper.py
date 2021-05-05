@@ -1,7 +1,7 @@
 import tensorflow as tf
-import DBM
 from tensorflow import keras
 import numpy as np
+from .preproc import resize
 
 class CapModel:
     def __init__(self):
@@ -11,20 +11,18 @@ class CapModel:
 
 
     def Classify(self, image):
+
+        image = self.pp.resize(new_shape=(48, 64), image=image)
         # reshape the image so that it has a channel
         image_w_channel = np.reshape(image, (np.shape(image)[0], np.shape(image)[1], 1))
         self.image_sequence = np.roll(self.image_sequence, shift=-1, axis=1)
         self.image_sequence[0][self.sequence_len-1] = image_w_channel
 
-
         predictions = self.model.predict(self.image_sequence)
 
-        indx = np.argmax(predictions)
-        return chr(ord('@')+indx), predictions[0][indx]*100
+        predictions.sort()
 
-    # TODO: return top 3 predictions
-    def getTop3(self, image):
-        return ["D", "O", "G"]
+        return map(str, predictions[0][0:3]*100)
 
 # this is a debug method, used for tseting the model wrapper without any other files
 if ( __name__ == "__main__" ):

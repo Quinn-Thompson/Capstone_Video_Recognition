@@ -42,6 +42,11 @@ def edit_image(operation):
     # this method of mutation is sort of bad?
     # really theres only two ways of handling it
     # mass matrix manipulation or iterating through each video sequence
+    # if you want to see a good version (and better program in general)
+    # for mass matrix manipulation, check out mutator_np.py in defunct_and_test_files
+    # this is a file taken from a personal project that 
+    # uses zero for loops to do all the mutations of the images
+    # however, this incurs the issue of taking up a ton of memory
     
     # list the number of gestures
     gesture_path = 'database/gestures_seperate/'

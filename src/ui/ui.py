@@ -4,7 +4,7 @@ import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication
-import cv2
+from cv2 import cv2
 import numpy as np
 
 import ModelWrapper
@@ -103,12 +103,28 @@ class MLGestureRecognition(QtWidgets.QWidget):
 
     def loadModel(self, model):
         print(f">>> Load model: {model}")
-        self.model = ModelWrapper.CapModel()
+        if model == "dog":
+            self.model = ModelWrapper.CapModel()
 
     @QtCore.pyqtSlot(np.ndarray)
     def updateImage(self, cvImg):
         cur = self.stackedWidget.currentWidget()
         if cur == self.widgetEndUser or cur == self.widgetDev:
+            preProcImg = self.preProc(cvImg)
+            h, w = preProcImg.shape
+            cur.labelImage.setPixmap(
+                QtGui.QPixmap.fromImage(
+                    QtGui.QImage(
+                        preProcImg.data, w, h, w, QtGui.QImage.Format_Grayscale8
+                    ).scaled(
+                        cur.displayWidth,
+                        cur.displayHeight,
+                        QtCore.Qt.KeepAspectRatio,
+                    )
+                )
+            )
+            cur.lc.updatePredictions(self.model.getTop3(cvImg))
+        if cur == self.widgetDev or cur == self.widgetTraining:
             h, w = cvImg.shape
             cur.labelImage.setPixmap(
                 QtGui.QPixmap.fromImage(
@@ -121,29 +137,19 @@ class MLGestureRecognition(QtWidgets.QWidget):
                     )
                 )
             )
-            cur.lc.updatePredictions(self.model.getTop3(cvImg))
-        if cur == self.widgetDev or cur == self.widgetTraining:
-            preProcImg = self.preProc(cvImg)
-            h, w, ch = preProcImg.shape
-            cur.labelPreProcImage.setPixmap(
-                QtGui.QPixmap.fromImage(
-                    QtGui.QImage(
-                        preProcImg.data,
-                        w,
-                        h,
-                        ch * w,
-                        QtGui.QImage.Format_RGB888,
-                    ).scaled(
-                        cur.displayWidth,
-                        cur.displayHeight,
-                        QtCore.Qt.KeepAspectRatio,
-                    )
-                )
-            )
 
     # TODO: Update preProc
     def preProc(self, img):
-        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # preprocess to remove background and scale from 1 to 0
+        im_d_preproc = self.pp_noresize.preproccess(im_depth)
+        # reset back to 0-255 for 8 bit greyscale image
+        # this is done beacuse proprocess does a downscale from 0-1 while 
+        # removing the background
+        im_d_preprocm = np.asarray(np.multiply(im_d_preproc, 255), dtype=np.uint8)
+        cv2.imshow("test", im_d_preproc)
+
+        # if a key is pressed, start the collection, otherwise loop
+        k = cv2.waitKey(1)
 
     def changeView(self, view):
         print(f">>> Change View: {view}")
