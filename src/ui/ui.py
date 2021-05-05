@@ -157,14 +157,13 @@ class MLGestureRecognition(QtWidgets.QWidget):
                     )
                 )
             )
-            cur.lc.updatePredictions(self.model.Classify(preProcImgN))
             cur.streamIdx += 1
 
-        if cur == self.widgetDev or cur == self.widgetTraining:
-            cvImg = np.asarray((cvImg-np.min(cvImg))/(np.max(cvImg)/255), dtype=np.uint8)
-            h, w = cvImg.shape
-        else:
-            cur.lc.updatePredictions(self.model.getTop3(cvImg))
+        cvImg = np.asarray((cvImg-np.min(cvImg))/(np.max(cvImg)/255), dtype=np.uint8)
+        h, w = cvImg.shape
+
+        if cur != self.widgetTraining:
+            cur.lc.updatePredictions(self.model.Classify(cvImg))
 
         if cur == self.widgetDev:
             rgbImg = cv2.cvtColor(cvImg, cv2.COLOR_BGR2RGB)
