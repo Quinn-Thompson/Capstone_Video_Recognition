@@ -1,29 +1,35 @@
 import functools
 import os
 import sys
+import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication
 from cv2 import cv2
 import numpy as np
 
-import ModelWrapper
+from src.tools.ModelWrapper import CapModel
 from src.ui.videoThread import VideoThread
 from src.ui.widgets import DevWidget, EndUserWidget, TrainingWidget
+from ..tools.preproc import PreProc
 
 
 class MLGestureRecognition(QtWidgets.QWidget):
     def __init__(self):
         super(MLGestureRecognition, self).__init__()
+        # initialize preprocessing process but disallow resizing in this case
+        self.pp_noresize = PreProc(resize=False)
         self.setupUI()
+        self.prev_time = time.time() * 1000
 
     def setupUI(self):
         self.initMainWindow()
+
         self.initMenuBar()
-        self.initVideoThread()
         self.initUI()
         self.mainWindow.setCentralWidget(self.stackedWidget)
         QtCore.QMetaObject.connectSlotsByName(self.mainWindow)
+        self.initVideoThread()
 
     def initMainWindow(self):
         self.mainWindow = QtWidgets.QMainWindow()
@@ -104,22 +110,20 @@ class MLGestureRecognition(QtWidgets.QWidget):
     def loadModel(self, model):
         print(f">>> Load model: {model}")
         if model == "dog":
-            self.model = ModelWrapper.CapModel()
+            self.model = CapModel()
 
     @QtCore.pyqtSlot(np.ndarray)
     def updateImage(self, cvImg):
+        print("timestamp updateImage: " + str(time.time() * 1000) + ". t between last frame " + str (time.time() * 1000 - self.prev_time) + "\n")
+        self.prev_time = time.time() * 1000
         cur = self.stackedWidget.currentWidget()
         if cur == self.widgetEndUser or cur == self.widgetDev:
-            preProcImg = self.preProc(cvImg)
-            h, w, ch = preProcImg.shape
+            preProcImgD, preProcImgN = self.preProc(cvImg)
+            h, w = preProcImgD.shape
             cur.labelPreProcImage.setPixmap(
                 QtGui.QPixmap.fromImage(
                     QtGui.QImage(
-                        preProcImg.data,
-                        w,
-                        h,
-                        ch * w,
-                        QtGui.QImage.Format_RGB888,
+                        preProcImgD.data, w, h, w, QtGui.QImage.Format_Grayscale8
                     ).scaled(
                         cur.displayWidth,
                         cur.displayHeight,
@@ -127,14 +131,15 @@ class MLGestureRecognition(QtWidgets.QWidget):
                     )
                 )
             )
-            cur.lc.updatePredictions(self.model.getTop3(cvImg))
+            
+            cur.lc.updatePredictions(self.model.Classify(preProcImgN))
         if cur == self.widgetDev or cur == self.widgetTraining:
-            rgbImg = cv2.cvtColor(cvImg, cv2.COLOR_BGR2RGB)
-            h, w, ch = rgbImg.shape
+            cvImg = np.asarray((cvImg-np.min(cvImg))/(np.max(cvImg)/255), dtype=np.uint8)
+            h, w = cvImg.shape
             cur.labelImage.setPixmap(
                 QtGui.QPixmap.fromImage(
                     QtGui.QImage(
-                        rgbImg.data, w, h, ch * w, QtGui.QImage.Format_RGB888
+                        cvImg.data, w, h, w, QtGui.QImage.Format_Grayscale8
                     ).scaled(
                         cur.displayWidth,
                         cur.displayHeight,
@@ -142,10 +147,22 @@ class MLGestureRecognition(QtWidgets.QWidget):
                     )
                 )
             )
+        print("Finished signal\n")
 
     # TODO: Update preProc
     def preProc(self, img):
-        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # this image is for displaying
+        # preprocess to remove background and scale from 1 to 0
+        im_preproc = self.pp_noresize.preproccess(img)
+        # reset back to 0-255 for 8 bit greyscale image
+        # this is done beacuse proprocess does a downscale from 0-1 while 
+        # removing the background
+        im_d_preproc = np.asarray(np.multiply(im_preproc, 255), dtype=np.uint8)
+        
+        # this image is for the network (48 by 64 image resize)
+        im_n_preproc = self.pp_noresize.resize(new_shape=(48, 64), image=im_preproc)
+
+        return im_d_preproc, im_n_preproc
 
     def changeView(self, view):
         print(f">>> Change View: {view}")
