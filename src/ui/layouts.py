@@ -6,27 +6,35 @@ class ClassificationLayout(QtWidgets.QGridLayout):
         super(ClassificationLayout, self).__init__()
 
         self.labelClassHead = QtWidgets.QLabel()
+        self.labelClassHead.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.labelClassHead.setObjectName("EUlabelClassHead")
         self.labelClassHead.setText("Classification")
 
         self.labelPredict10 = QtWidgets.QLabel()
+        
         self.labelPredict10.setObjectName("EUlabelPredict10")
+        self.labelPredict10.setStyleSheet("background-color: rgba(65, 65, 65, 255) ; color: rgba(200, 200, 200, 255);")
         self.labelPredict10.setText("1:")
         self.labelPredict11 = QtWidgets.QLabel()
+        self.labelPredict11.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.labelPredict11.setObjectName("EUlabelPredict11")
         self.labelPredict11.setText("A")
 
         self.labelPredict20 = QtWidgets.QLabel()
+        self.labelPredict20.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.labelPredict20.setObjectName("EUlabelPredict20")
         self.labelPredict20.setText("2:")
         self.labelPredict21 = QtWidgets.QLabel()
+        self.labelPredict21.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.labelPredict21.setObjectName("EUlabelPredict21")
         self.labelPredict21.setText("B")
 
         self.labelPredict30 = QtWidgets.QLabel()
+        self.labelPredict30.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.labelPredict30.setObjectName("EUlabelPredict30")
         self.labelPredict30.setText("3:")
         self.labelPredict31 = QtWidgets.QLabel()
+        self.labelPredict31.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.labelPredict31.setObjectName("EUlabelPredict31")
         self.labelPredict31.setText("C")
 

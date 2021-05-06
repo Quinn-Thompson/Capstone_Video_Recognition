@@ -33,12 +33,14 @@ class MLGestureRecognition(QtWidgets.QWidget):
 
     def initMainWindow(self):
         self.mainWindow = QtWidgets.QMainWindow()
+        self.mainWindow.setStyleSheet("background-color: qlineargradient(spread:pad, x1:0.683, y1:1, x2:1, y2:0, stop:0 rgba(100, 100, 100,255), stop:1 rgba(170, 170, 170, 255));")
         self.mainWindow.setGeometry(100, 100, 800, 600)
         self.mainWindow.setWindowTitle("ML Gesture Recognition")
 
     def initMenuBar(self):
         # Create Menu bar
         self.menubar = QtWidgets.QMenuBar(self.mainWindow)
+        self.menubar.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 20))
         self.menubar.setObjectName("menubar")
 
