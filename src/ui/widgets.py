@@ -13,13 +13,16 @@ class EndUserWidget(QtWidgets.QWidget):
 
         self.setObjectName("widgetEndUser")
 
-        self.displayWidth = 800
-        self.displayHeight = 600
+        self.displayWidth = 640
+        self.displayHeight = 480
 
         self.labelPreProcImage = QtWidgets.QLabel(self)
         self.labelPreProcImage.setObjectName("labelPreProcImage")
         self.labelPreProcImage.resize(self.displayWidth, self.displayHeight)
         self.labelPreProcImage.setPixmap(QtGui.QPixmap("bk.jpg"))
+        self.labelPreProcImage.setStyleSheet("border: 3px solid black;")
+        self.labelPreProcImage.setAlignment(QtCore.Qt.AlignCenter)
+
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.labelPreProcImage)
@@ -34,20 +37,24 @@ class DevWidget(QtWidgets.QWidget):
 
         self.setObjectName("widgetDev")
 
-        self.displayWidth = 800
-        self.displayHeight = 600
+        self.displayWidth = 640
+        self.displayHeight = 480
 
         self.labelPreProcImage = QtWidgets.QLabel(self)
         self.labelPreProcImage.setObjectName("labelPreProcImage")
         self.labelPreProcImage.setText("")
         self.labelPreProcImage.resize(self.displayWidth, self.displayHeight)
         self.labelPreProcImage.setPixmap(QtGui.QPixmap("bk.jpg"))
+        self.labelPreProcImage.setStyleSheet("border: 3px solid black;")
+        self.labelPreProcImage.setAlignment(QtCore.Qt.AlignCenter)
 
         self.labelImage = QtWidgets.QLabel(self)
         self.labelImage.setObjectName("labelImage")
         self.labelImage.setText("")
         self.labelImage.resize(self.displayWidth, self.displayHeight)
         self.labelImage.setPixmap(QtGui.QPixmap("bk.jpg"))
+        self.labelImage.setStyleSheet("border: 3px solid black;")
+        self.labelImage.setAlignment(QtCore.Qt.AlignCenter)
 
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layoutVid = QtWidgets.QHBoxLayout()
@@ -65,24 +72,31 @@ class TrainingWidget(QtWidgets.QWidget):
         super(TrainingWidget, self).__init__()
         self.streamLength = 24
         self.streamIdx = 0
-        self.recording = np.ndarray((self.streamLength, 480, 640, 3), dtype=np.uint8)
+        self.recording = np.ndarray((self.streamLength, 48, 64), dtype=np.float)
+        self.recordingD = np.ndarray((self.streamLength, 480, 640), dtype=np.uint8)
 
         self.setObjectName("widgetTraining")
 
-        self.displayWidth = 800
-        self.displayHeight = 600
+        self.displayWidth = 640
+        self.displayHeight = 480
 
         self.labelPreProcImage = QtWidgets.QLabel(self)
         self.labelPreProcImage.setObjectName("labelPreProcImage")
         self.labelPreProcImage.setText("")
         self.labelPreProcImage.resize(self.displayWidth, self.displayHeight)
         self.labelPreProcImage.setPixmap(QtGui.QPixmap("bk.jpg"))
+        self.labelPreProcImage.setStyleSheet("border: 3px solid black;")
+        self.labelPreProcImage.setAlignment(QtCore.Qt.AlignCenter)
 
         self.labelCapturedImage = QtWidgets.QLabel(self)
         self.labelCapturedImage.setObjectName("labelCapturedImage")
         self.labelCapturedImage.setText("")
         self.labelCapturedImage.resize(self.displayWidth, self.displayHeight)
         self.labelCapturedImage.setPixmap(QtGui.QPixmap("bk.jpg"))
+        self.labelCapturedImage.setStyleSheet("border: 3px solid black;")
+        self.labelCapturedImage.setAlignment(QtCore.Qt.AlignCenter)
+        
+
 
         self.layout = QtWidgets.QVBoxLayout(self)
 
@@ -94,11 +108,14 @@ class TrainingWidget(QtWidgets.QWidget):
         self.layoutButtons = QtWidgets.QHBoxLayout()
 
         self.btnRec = QtWidgets.QPushButton(self)
+        self.btnRec.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.btnRec.setText("Record")
         self.btnRec.setShortcut("Space")
         self.btnRec.setCheckable(True)
+        self.btnRec.clicked.connect(self.recBtn)
 
         self.btnSave = QtWidgets.QPushButton(self)
+        self.btnSave.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
         self.btnSave.setText("Save")
         self.btnSave.clicked.connect(self.saveBtn)
 
@@ -111,8 +128,9 @@ class TrainingWidget(QtWidgets.QWidget):
     def recBtn(self):
         if self.btnRec.isChecked():
             print(">>> Start Recording")
+            self.recording = np.zeros((self.streamLength, 48, 64), dtype=np.float)
+            self.recordingD = np.zeros((self.streamLength, 480, 640), dtype=np.uint8)
             self.streamIdx = 0
-            self.recording = np.zeros((self.streamLength, 480, 640, 3), dtype=np.uint8)
         else:
             print(">>> Button Not Clicked")
 
@@ -125,4 +143,5 @@ class TrainingWidget(QtWidgets.QWidget):
             print(fileName)
             with open(fileName, "bx") as fd:
                 pickle.dump(np.array(self.recording), fd)
-        self.recording = np.zeros((self.streamLength, 480, 640, 3), dtype=np.uint8)
+        self.recording = np.zeros((self.streamLength, 48, 64), dtype=np.float)
+        self.recordingD = np.zeros((self.streamLength, 480, 640), dtype=np.uint8)

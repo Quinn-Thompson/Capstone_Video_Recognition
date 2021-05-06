@@ -111,7 +111,6 @@ class DataGenerator(seq):
             # reshape it so that it includes the number of channels (this may need to be reworked)
             # I would instead save the files with channels attached, instead of loading a file into each channel
             loaded_figures[i,] = loaded_figure_no_channel
-            # then insert a label based on the file name without the .npy ( as mine were .npy array file, fastest loading time but larger than pickle)
             loaded_labels[i,] = to_categorical(self.labels[int(file_name)], 27)
 
         return loaded_figures, loaded_labels
