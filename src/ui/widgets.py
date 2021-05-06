@@ -23,7 +23,6 @@ class EndUserWidget(QtWidgets.QWidget):
         self.labelPreProcImage.setStyleSheet("border: 3px solid black;")
         self.labelPreProcImage.setAlignment(QtCore.Qt.AlignCenter)
 
-
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.labelPreProcImage)
 
@@ -72,8 +71,12 @@ class TrainingWidget(QtWidgets.QWidget):
         super(TrainingWidget, self).__init__()
         self.streamLength = 24
         self.streamIdx = 0
-        self.recording = np.ndarray((self.streamLength, 48, 64), dtype=np.float)
-        self.recordingD = np.ndarray((self.streamLength, 480, 640), dtype=np.uint8)
+        self.recording = np.ndarray(
+            (self.streamLength, 48, 64), dtype=np.float
+        )
+        self.recordingD = np.ndarray(
+            (self.streamLength, 480, 640), dtype=np.uint8
+        )
 
         self.setObjectName("widgetTraining")
 
@@ -95,8 +98,6 @@ class TrainingWidget(QtWidgets.QWidget):
         self.labelCapturedImage.setPixmap(QtGui.QPixmap("bk.jpg"))
         self.labelCapturedImage.setStyleSheet("border: 3px solid black;")
         self.labelCapturedImage.setAlignment(QtCore.Qt.AlignCenter)
-        
-
 
         self.layout = QtWidgets.QVBoxLayout(self)
 
@@ -108,14 +109,18 @@ class TrainingWidget(QtWidgets.QWidget):
         self.layoutButtons = QtWidgets.QHBoxLayout()
 
         self.btnRec = QtWidgets.QPushButton(self)
-        self.btnRec.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
+        self.btnRec.setStyleSheet(
+            "background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);"
+        )
         self.btnRec.setText("Record")
         self.btnRec.setShortcut("Space")
         self.btnRec.setCheckable(True)
         self.btnRec.clicked.connect(self.recBtn)
 
         self.btnSave = QtWidgets.QPushButton(self)
-        self.btnSave.setStyleSheet("background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);")
+        self.btnSave.setStyleSheet(
+            "background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);"
+        )
         self.btnSave.setText("Save")
         self.btnSave.clicked.connect(self.saveBtn)
 
@@ -128,8 +133,12 @@ class TrainingWidget(QtWidgets.QWidget):
     def recBtn(self):
         if self.btnRec.isChecked():
             print(">>> Start Recording")
-            self.recording = np.zeros((self.streamLength, 48, 64), dtype=np.float)
-            self.recordingD = np.zeros((self.streamLength, 480, 640), dtype=np.uint8)
+            self.recording = np.zeros(
+                (self.streamLength, 48, 64), dtype=np.float
+            )
+            self.recordingD = np.zeros(
+                (self.streamLength, 480, 640), dtype=np.uint8
+            )
             self.streamIdx = 0
         else:
             print(">>> Button Not Clicked")
@@ -138,10 +147,18 @@ class TrainingWidget(QtWidgets.QWidget):
         print(">>> Save")
         options = QtWidgets.QFileDialog.Options()
         options |= QtWidgets.QFileDialog.DontUseNativeDialog
-        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self, "QFileDialog.getSaveFileName()", "exports", "All Files (*);;Python Files (*.py)", options=options)
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            "QFileDialog.getSaveFileName()",
+            "exports",
+            "All Files (*);;Python Files (*.py)",
+            options=options,
+        )
         if fileName:
             print(fileName)
             with open(fileName, "bx") as fd:
                 pickle.dump(np.array(self.recording), fd)
         self.recording = np.zeros((self.streamLength, 48, 64), dtype=np.float)
-        self.recordingD = np.zeros((self.streamLength, 480, 640), dtype=np.uint8)
+        self.recordingD = np.zeros(
+            (self.streamLength, 480, 640), dtype=np.uint8
+        )
