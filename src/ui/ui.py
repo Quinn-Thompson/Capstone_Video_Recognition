@@ -118,7 +118,7 @@ class MLGestureRecognition(QtWidgets.QWidget):
         self.prev_time = time.time() * 1000
         cur = self.stackedWidget.currentWidget()
 
-        preProcImgD, preProcImgN = self.preProc(cvImg)
+        preProcImgD, _ = self.preProc(cvImg)
         h, w = preProcImgD.shape
         cur.labelPreProcImage.setPixmap(
             QtGui.QPixmap.fromImage(
