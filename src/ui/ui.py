@@ -24,21 +24,26 @@ class MLGestureRecognition(QtWidgets.QWidget):
 
     def setupUI(self):
         self.initMainWindow()
-
+        self.initVideoThread()
         self.initMenuBar()
         self.initUI()
         self.mainWindow.setCentralWidget(self.stackedWidget)
         QtCore.QMetaObject.connectSlotsByName(self.mainWindow)
-        self.initVideoThread()
 
     def initMainWindow(self):
         self.mainWindow = QtWidgets.QMainWindow()
+        self.mainWindow.setStyleSheet(
+            "background-color: qlineargradient(spread:pad, x1:0.683, y1:1, x2:1, y2:0, stop:0 rgba(100, 100, 100,255), stop:1 rgba(170, 170, 170, 255));"
+        )
         self.mainWindow.setGeometry(100, 100, 800, 600)
         self.mainWindow.setWindowTitle("ML Gesture Recognition")
 
     def initMenuBar(self):
         # Create Menu bar
         self.menubar = QtWidgets.QMenuBar(self.mainWindow)
+        self.menubar.setStyleSheet(
+            "background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);"
+        )
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 20))
         self.menubar.setObjectName("menubar")
 
@@ -111,19 +116,45 @@ class MLGestureRecognition(QtWidgets.QWidget):
         print(f">>> Load model: {model}")
         if model == "dog":
             self.model = CapModel()
+            self.thread.imExp = 100
 
     @QtCore.pyqtSlot(np.ndarray)
     def updateImage(self, cvImg):
-        print("timestamp updateImage: " + str(time.time() * 1000) + ". t between last frame " + str (time.time() * 1000 - self.prev_time) + "\n")
-        self.prev_time = time.time() * 1000
         cur = self.stackedWidget.currentWidget()
-        if cur == self.widgetEndUser or cur == self.widgetDev:
-            preProcImgD, preProcImgN = self.preProc(cvImg)
-            h, w = preProcImgD.shape
-            cur.labelPreProcImage.setPixmap(
+
+        preProcImgD, _ = self.preProc(cvImg)
+        h, w = preProcImgD.shape
+        cur.labelPreProcImage.setPixmap(
+            QtGui.QPixmap.fromImage(
+                QtGui.QImage(
+                    preProcImgD.data, w, h, w, QtGui.QImage.Format_Grayscale8
+                ).scaled(
+                    cur.displayWidth,
+                    cur.displayHeight,
+                    QtCore.Qt.KeepAspectRatio,
+                )
+            )
+        )
+
+        if cur == self.widgetTraining:
+            if cur.btnRec.isChecked():
+                if cur.streamIdx < cur.streamLength:
+                    cur.recording[cur.streamIdx] = preProcImgN
+                    cur.recordingD[cur.streamIdx] = preProcImgD
+                else:
+                    cur.btnRec.setChecked(False)
+
+            if cur.streamIdx >= cur.streamLength:
+                cur.streamIdx = 0
+
+            cur.labelCapturedImage.setPixmap(
                 QtGui.QPixmap.fromImage(
                     QtGui.QImage(
-                        preProcImgD.data, w, h, w, QtGui.QImage.Format_Grayscale8
+                        cur.recordingD[cur.streamIdx].data,
+                        w,
+                        h,
+                        w,
+                        QtGui.QImage.Format_Grayscale8,
                     ).scaled(
                         cur.displayWidth,
                         cur.displayHeight,
@@ -131,10 +162,17 @@ class MLGestureRecognition(QtWidgets.QWidget):
                     )
                 )
             )
-            
+            cur.streamIdx += 1
+
+        cvImg = np.asarray(
+            (cvImg - np.min(cvImg)) / (np.max(cvImg) / 255), dtype=np.uint8
+        )
+        h, w = cvImg.shape
+
+        if cur != self.widgetTraining:
             cur.lc.updatePredictions(self.model.Classify(preProcImgN))
-        if cur == self.widgetDev or cur == self.widgetTraining:
-            cvImg = np.asarray((cvImg-np.min(cvImg))/(np.max(cvImg)/255), dtype=np.uint8)
+
+        if cur == self.widgetDev:
             h, w = cvImg.shape
             cur.labelImage.setPixmap(
                 QtGui.QPixmap.fromImage(
@@ -147,7 +185,6 @@ class MLGestureRecognition(QtWidgets.QWidget):
                     )
                 )
             )
-        print("Finished signal\n")
 
     # TODO: Update preProc
     def preProc(self, img):
@@ -155,12 +192,14 @@ class MLGestureRecognition(QtWidgets.QWidget):
         # preprocess to remove background and scale from 1 to 0
         im_preproc = self.pp_noresize.preproccess(img)
         # reset back to 0-255 for 8 bit greyscale image
-        # this is done beacuse proprocess does a downscale from 0-1 while 
+        # this is done beacuse proprocess does a downscale from 0-1 while
         # removing the background
         im_d_preproc = np.asarray(np.multiply(im_preproc, 255), dtype=np.uint8)
-        
+
         # this image is for the network (48 by 64 image resize)
-        im_n_preproc = self.pp_noresize.resize(new_shape=(48, 64), image=im_preproc)
+        im_n_preproc = self.pp_noresize.resize(
+            new_shape=(48, 64), image=im_preproc
+        )
 
         return im_d_preproc, im_n_preproc
 

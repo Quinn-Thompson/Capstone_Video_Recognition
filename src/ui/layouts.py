@@ -6,39 +6,39 @@ class ClassificationLayout(QtWidgets.QGridLayout):
         super(ClassificationLayout, self).__init__()
 
         self.labelClassHead = QtWidgets.QLabel()
+        self.labelClassHead.setStyleSheet(
+            "background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);"
+        )
         self.labelClassHead.setObjectName("EUlabelClassHead")
         self.labelClassHead.setText("Classification")
 
-        self.labelPredict10 = QtWidgets.QLabel()
-        self.labelPredict10.setObjectName("EUlabelPredict10")
-        self.labelPredict10.setText("1:")
-        self.labelPredict11 = QtWidgets.QLabel()
-        self.labelPredict11.setObjectName("EUlabelPredict11")
-        self.labelPredict11.setText("A")
+        self.labelPredict1 = QtWidgets.QLabel()
+        self.labelPredict1.setObjectName("EUlabelPredict1")
+        self.labelPredict1.setStyleSheet(
+            "background-color: rgba(65, 65, 65, 255) ; color: rgba(200, 200, 200, 255);"
+        )
+        self.labelPredict1.setText("1:")
 
-        self.labelPredict20 = QtWidgets.QLabel()
-        self.labelPredict20.setObjectName("EUlabelPredict20")
-        self.labelPredict20.setText("2:")
-        self.labelPredict21 = QtWidgets.QLabel()
-        self.labelPredict21.setObjectName("EUlabelPredict21")
-        self.labelPredict21.setText("B")
+        self.labelPredict2 = QtWidgets.QLabel()
+        self.labelPredict2.setStyleSheet(
+            "background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);"
+        )
+        self.labelPredict2.setObjectName("EUlabelPredict2")
+        self.labelPredict2.setText("2:")
 
-        self.labelPredict30 = QtWidgets.QLabel()
-        self.labelPredict30.setObjectName("EUlabelPredict30")
-        self.labelPredict30.setText("3:")
-        self.labelPredict31 = QtWidgets.QLabel()
-        self.labelPredict31.setObjectName("EUlabelPredict31")
-        self.labelPredict31.setText("C")
+        self.labelPredict3 = QtWidgets.QLabel()
+        self.labelPredict3.setStyleSheet(
+            "background-color: rgba(65, 65, 65, 255); color: rgba(200, 200, 200, 255);"
+        )
+        self.labelPredict3.setObjectName("EUlabelPredict3")
+        self.labelPredict3.setText("3:")
 
         self.addWidget(self.labelClassHead, 0, 0, 1, 2)
-        self.addWidget(self.labelPredict10, 1, 0)
-        self.addWidget(self.labelPredict11, 1, 1)
-        self.addWidget(self.labelPredict20, 2, 0)
-        self.addWidget(self.labelPredict21, 2, 1)
-        self.addWidget(self.labelPredict30, 3, 0)
-        self.addWidget(self.labelPredict31, 3, 1)
+        self.addWidget(self.labelPredict1, 1, 0)
+        self.addWidget(self.labelPredict2, 2, 0)
+        self.addWidget(self.labelPredict3, 3, 0)
 
     def updatePredictions(self, predictions):
-        self.labelPredict11.setText(predictions[0])
-        self.labelPredict21.setText(predictions[1])
-        self.labelPredict31.setText(predictions[2])
+        self.labelPredict1.setText(f"1. {predictions[0]}")
+        self.labelPredict2.setText(f"2. {predictions[1]}")
+        self.labelPredict3.setText(f"3. {predictions[2]}")
