@@ -9,6 +9,7 @@ from cv2 import cv2
 import numpy as np
 
 from src.tools.ModelWrapper import CapModel
+from src.tools.ModelWrapper import CapModelTks
 from src.ui.videoThread import VideoThread
 from src.ui.widgets import DevWidget, EndUserWidget, TrainingWidget
 from ..tools.preproc import PreProc
@@ -76,7 +77,7 @@ class MLGestureRecognition(QtWidgets.QWidget):
             self.menuModels.addAction(model)
 
         self.menubar.addAction(self.menuModels.menuAction())
-        self.loadModel("dog")
+        self.loadModel("tks")
 
         # View dropdown
         self.menuView = QtWidgets.QMenu(self.menubar)
@@ -117,12 +118,15 @@ class MLGestureRecognition(QtWidgets.QWidget):
         if model == "dog":
             self.model = CapModel()
             self.thread.imExp = 100
+        elif model == "tks":
+            self.model = CapModelTks()
+            self.thread.imExp = 333
 
     @QtCore.pyqtSlot(np.ndarray)
     def updateImage(self, cvImg):
         cur = self.stackedWidget.currentWidget()
 
-        preProcImgD, _ = self.preProc(cvImg)
+        preProcImgD, preProcImgN = self.preProc(cvImg)
         h, w = preProcImgD.shape
         cur.labelPreProcImage.setPixmap(
             QtGui.QPixmap.fromImage(

@@ -19,7 +19,7 @@ class Predict:
 
 
         for indx in best_three:
-            conf = predictions[0][indx]*100
+            self.conf = predictions[0][indx]*100
             out.append(str("Prediction Character: " + chr(ord('@')+indx)) + "  Confidence Value: " + str(self.conf))
 
         return out
@@ -41,6 +41,31 @@ class CapModel:
         self.image_sequence[0][self.sequence_len-1] = image_w_channel
         
         return self.pred.predict_best3(self.model, self.image_sequence)
+
+class CapModelTks:
+    def __init__(self):
+        self.model = tf.keras.models.load_model('models/tks')
+        self.sequence_len = 3
+        self.image_sequence = np.zeros((1, self.sequence_len, 48, 64, 1))
+        self.pp = PreProc()
+        self.pred = Predict()
+        self.arr = np.array([np.ones((48, 64)), np.ones((48, 64)), np.ones((48, 64))])
+
+    def Classify(self, image):
+
+
+        # reshape the image so that it has a channel
+        #image_w_channel = np.reshape(image, (np.shape(image)[0], np.shape(image)[1], 1))
+	
+	# shift the array
+        self.arr[0], self.arr[1], self.arr[2] = self.arr[1], self.arr[2], image
+
+
+	# compress into one image
+        input_for_tks = np.array([self.arr[0], self.arr[1], self.arr[2]], dtype=float)
+        input_for_tks = np.reshape(input_for_tks, (1, 48, 64, 3))
+
+        return self.pred.predict_best3(self.model, input_for_tks)
 
 # this is a debug method, used for tseting the model wrapper without any other files
 if ( __name__ == "__main__" ):
