@@ -17,8 +17,15 @@ packages. Otherwise, following the instructions for building and installing the
 libraries from source.
 
 ### Mac
+Visit the
+[librealsense](https://github.com/IntelRealSense/librealsense/blob/master/doc/distribution_linux.md)
+ repository and clone it onto your local machine. Follow the instructions to build the packages from source, then copy the 
+*.so and *.dylib files, 12 total, to this project's working directory (where the *.py files are). Follow the Python 
+instructions to continue setting the project's dependancies.
 
 ### Windows
+The librealsense driver should automatically be installed when plugged into your device. Install Python 3.710 on your device. Then Follow the Python 
+instructions to continue setting the project's dependancies.
 
 ### Python
 
