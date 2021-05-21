@@ -20,7 +20,10 @@ class Predict:
 
         for indx in best_three:
             self.conf = predictions[0][indx]*100
-            out.append(str("Prediction Character: " + chr(ord('@')+indx)) + "  Confidence Value: " + str(self.conf))
+            char_out = chr(ord('@')+indx)
+            if char_out == '@':
+                char_out = 'No Obj Det (ZS)'
+            out.append(str("Prediction Character: " + char_out) + "  Confidence Value: " + str(round(self.conf, 2)))
 
         return out
 

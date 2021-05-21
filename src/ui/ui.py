@@ -126,7 +126,7 @@ class MLGestureRecognition(QtWidgets.QWidget):
     def updateImage(self, cvImg):
         cur = self.stackedWidget.currentWidget()
 
-        preProcImgD, preProcImgN = self.preProc(cvImg)
+        preProcImgD, preProcImgN = self.preProc(cvImg.copy())
         h, w = preProcImgD.shape
         cur.labelPreProcImage.setPixmap(
             QtGui.QPixmap.fromImage(
